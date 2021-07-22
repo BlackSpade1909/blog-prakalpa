@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from blog.models import Post, Comment
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
@@ -36,13 +36,7 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     success_url = reverse_lazy('post_list')
 
-class DraftListView(LoginRequiredMixin, ListView):
-    login_url = '/login/'
-    redirect_field_name = 'blog/post_list.html'
-    model = Post
 
-    def get_qureyset(self):
-        return Post.objects.filter(publish_date__isnull=True).orderby('-created_date')
 
 #################################################################
 #################################################################
@@ -50,9 +44,9 @@ class DraftListView(LoginRequiredMixin, ListView):
 
 @login_required
 def post_publish(request,pk):
-    post = get_object_or_404(Post, pk=pk)
-    post.publish
-    return redirect('post_detail', pk=pk)
+    post = get_object_or_404(Post,pk=pk)
+    post.publish()
+    return redirect('post_list')
 
 
 @login_required
